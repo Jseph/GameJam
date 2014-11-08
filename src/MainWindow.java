@@ -96,8 +96,8 @@ public class MainWindow extends JFrame implements KeyListener
 		g.drawImage(buffer, 0, 0, this);
 		//public void step(boolean LeftPressed, boolean RightPressed, boolean UpPressed, boolean DownPressed, boolean SpacePressed)
 
-		//pe.step(leftPressed, rightPressed, upPressed, downPressed, spacePressed);
-		System.out.println(1000/(System.currentTimeMillis()-ts));
+		pe.step(leftPressed, rightPressed, upPressed, downPressed, spacePressed);
+		//System.out.println(1000/(System.currentTimeMillis()-ts));
 		//}
 	}
 	public static void main(String[] args) 
