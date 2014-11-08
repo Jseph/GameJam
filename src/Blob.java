@@ -21,10 +21,26 @@ public class Blob
 	}
 	public double TangentalVelocity()
 	{
-		return VelocityX*Math.cos(orientation)+VelocityY*Math.sin(orientation);
+		return VelocityX*Math.cos(orientation)-VelocityY*Math.sin(orientation);
 	}
+	//This is defined as velocity toward the surface.
 	public double NormalVelocity()
 	{
-		return VelocityX*Math.sin(orientation)-VelocityY*Math.cos(orientation);
+		return -VelocityX*Math.sin(orientation)-VelocityY*Math.cos(orientation);
+	}
+	public void setVelocityTanNorm(double tan, double norm)
+	{
+		VelocityX = tan*Math.cos(orientation) - norm*Math.sin(orientation);
+		VelocityY = -tan*Math.sin(orientation) - norm*Math.cos(orientation);
+	}
+	public void freeFromSurface()
+	{
+		aspectratio = 1;
+		stuckSurface = null;
+		setVelocityTanNorm(TangentalVelocity(), NormalVelocity()*0.8);
+	}
+	public void move(double dt)
+	{
+		center.setLocation(center.getX()+dt*VelocityX, center.getY()+dt*VelocityY);
 	}
 }

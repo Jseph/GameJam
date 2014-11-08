@@ -20,20 +20,23 @@ public class MainWindow extends JFrame implements KeyListener
 	public MainWindow()
 	{
 		super("DRoP");
-		Level l = new Level(0);
-		pe = new PhysicsEngine(l,new Blob(1,l.startPoint));
-		GraphicsDevice myDevice = this.getGraphicsConfiguration().getDevice();
-		try{
-			myDevice.setFullScreenWindow(this);
-		}catch(Exception e){
-			myDevice.setFullScreenWindow(null);
-			
-		}
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		xSize = (int)tk.getScreenSize().getWidth();
 		ySize = (int)tk.getScreenSize().getHeight();
 		buffer = new BufferedImage(xSize, ySize, BufferedImage.TYPE_4BYTE_ABGR);
-		ds = new DrawingState(xSize, ySize, 50, 0, 0);
+		Level l = new Level(0);
+		pe = new PhysicsEngine(l,new Blob(1,l.startPoint));
+		GraphicsDevice myDevice = this.getGraphicsConfiguration().getDevice();
+		setSize(xSize,ySize);
+		setUndecorated(true);
+		this.setVisible(true);
+		/*try{
+			myDevice.setFullScreenWindow(this);
+		}catch(Exception e){
+			myDevice.setFullScreenWindow(null);
+			
+		}*/
+		ds = new DrawingState(xSize, ySize, 10, 0, 0);
 		this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
 		done = false;
 		Thread renderThread = new Thread(new Runnable() {
@@ -103,6 +106,11 @@ public class MainWindow extends JFrame implements KeyListener
 	public static void main(String[] args) 
 	{
 		MainWindow mw = new MainWindow();
+		Blob b = new Blob(2, new Point2D.Double());
+		b.orientation = Math.PI/6;
+		b.setVelocityTanNorm(1, 1);
+		System.out.println(b.VelocityX+" "+b.VelocityY);
+		System.out.println(b.TangentalVelocity()+" "+b.NormalVelocity());
 	}
 	@Override
 	public void keyPressed(KeyEvent e) 

@@ -36,4 +36,11 @@ public class Surface
 		myGraphics.rotate(-theta);
 		myGraphics.translate(-(int)ms.getX(), -(int)ms.getY());
 	}
+	//returns orientation in units consistant with the rest of this
+	//terrible unit system. This corresponds to the orientation of the
+	//blob if it is sitting on this object
+	public double getOrientation()
+	{
+		return  Math.atan2(-end.getY()+start.getY(), end.getX()-start.getX());
+	}
 }
