@@ -44,7 +44,7 @@ public class MainWindow extends JFrame implements KeyListener
 				while(true)
 				{
 					//try {Thread.sleep(10);} catch (InterruptedException e) {}
-					//repaint wasn't working so I put this here...
+					//repaint();// wasn't working so I put this here...
 					paint((Graphics2D) getContentPane().getGraphics());
 				}
 			}
@@ -79,7 +79,7 @@ public class MainWindow extends JFrame implements KeyListener
 		myGraphics.rotate(-b.orientation);
 		//draw a rectangle representing blob location
 		myGraphics.setColor(Color.CYAN);
-		myGraphics.drawRect((int)(-ds.zoomLevel*b.aspectratio*b.unstressedsize/2), 
+		myGraphics.fillOval((int)(-ds.zoomLevel*b.aspectratio*b.unstressedsize/2), 
 				(int)(-ds.zoomLevel/b.aspectratio*b.unstressedsize/2), 
 				(int)(ds.zoomLevel*b.aspectratio*b.unstressedsize), 
 				(int)(ds.zoomLevel/b.aspectratio*b.unstressedsize));
