@@ -6,12 +6,15 @@ import java.io.*;
 public class Level 
 {
 	ArrayList<Surface> surfaces;
+	ArrayList<Actor> actors;
 	Point2D startPoint;
 	Rectangle2D endBox;
+	PhysicsEngine pe;
 	public Level(int number)
 	{
 		String levelPath = "level"+number+".dat";
 		surfaces = new ArrayList<Surface>();
+		actors = new ArrayList<Actor>();
 		try
 		{
 			Scanner scan = new Scanner(new File(levelPath));
@@ -32,6 +35,9 @@ public class Level
 				double ey = scan.nextDouble();
 				surfaces.add(new Surface(new Point2D.Double(sx, sy), new Point2D.Double(ex, ey), scan.nextBoolean()));
 			}
+			int numActors = scan.nextInt();
+			for(int i=0; i<numActors; i++)
+				Actor.getActor(scan);
 		}catch (Exception e){System.out.println("Something went wrong reading input file "+levelPath+ "\n" + e);}
 	}
 }
