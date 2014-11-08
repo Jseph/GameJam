@@ -1,3 +1,7 @@
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
 //import java.util.*;
 
 public class PhysicsEngine
@@ -107,7 +111,7 @@ public class PhysicsEngine
 			if(UpPressed)
 				NetForceDown -= 0.1*directionalinfluince;
 			
-			blob.center.setLocation(blob.VelocityX*DeltaT, blob.VelocityY*DeltaT);
+			blob.center.setLocation(blob.center.getX()+blob.VelocityX*DeltaT,blob.center.getY()+blob.VelocityY*DeltaT);
 			blob.VelocityX += NetForceRight*DeltaT;
 			blob.VelocityY += NetForceDown*DeltaT;
 			blob.aspectratio = 1;
@@ -122,10 +126,23 @@ public class PhysicsEngine
 		{
 			double r = ((s.end.getY()-s.start.getY())*(blob.center.getX()-s.start.getX()) + (s.end.getX()-s.start.getX())*(blob.center.getY()-s.start.getY()))/Math.sqrt(Math.pow((s.end.getY()-s.start.getY()),2) + Math.pow((s.end.getX()-s.start.getX()),2));
 			if(r<blob.unstressedsize/2)
-				if(blob.center.getY() > (-(s.end.getX()-s.start.getX())/(s.end.getY()-s.start.getY())*(blob.center.getX()-s.start.getX())+s.start.getY()))//above normal through 1
-					if(blob.center.getY() < (-(s.end.getX()-s.start.getX())/(s.end.getY()-s.start.getY())*(blob.center.getX()-s.end.getX())+s.end.getY()))//below normal through 2
-						if(blob.center.getY() > ((s.end.getY()-s.start.getY())/(s.end.getX()-s.start.getX())*(blob.center.getX()-s.start.getX())+s.start.getY()))//above line
-							return true;
+			{	
+				double theta1a = Math.atan2(blob.center.getY()-s.start.getY(),blob.center.getX()-s.start.getX());
+				double theta1b = Math.atan2(s.end.getY()-s.start.getY(),s.end.getX()-s.start.getX());
+				double difference1 = theta1a-theta1b;
+				if(difference1 > 2*Math.PI) difference1 -= 2*Math.PI;
+				if(difference1 < 2*Math.PI) difference1 += 2*Math.PI;
+			
+				double theta2a = Math.atan2(blob.center.getY()-s.end.getY(),blob.center.getX()-s.end.getX());
+				double theta2b = Math.atan2(s.start.getY()-s.end.getY(),s.start.getX()-s.end.getX());
+				double difference2 = theta2a-theta2b;
+				if(difference2 > 2*Math.PI) difference2 -= 2*Math.PI;
+				if(difference2 < 2*Math.PI) difference2 += 2*Math.PI;
+			
+				if(Math.abs(difference1) < Math.PI/2)
+					if(Math.abs(difference2) < Math.PI/2)
+						return true;
+			}
 		}
 		//make rectangles around the surfaces, check if the blob center is in the rectancle
 		//ends and corners may not end up being handled well
@@ -138,18 +155,41 @@ public class PhysicsEngine
 		//write this
 		//based on proximity and velocity
 		//if you switch surfaces make sure you do it correctly
-		
+		Surface bestsurface = level.surfaces.get(0);
+		double maxnormalvelocity = 0;
 		//for now do this only
 		for(Surface s:level.surfaces)
 		{
 			double r = ((s.end.getY()-s.start.getY())*(blob.center.getX()-s.start.getX()) + (s.end.getX()-s.start.getX())*(blob.center.getY()-s.start.getY()))/Math.sqrt(Math.pow((s.end.getY()-s.start.getY()),2) + Math.pow((s.end.getX()-s.start.getX()),2));
-			if(r<blob.unstressedsize/2)
-				if(blob.center.getY() > (-(s.end.getX()-s.start.getX())/(s.end.getY()-s.start.getY())*(blob.center.getX()-s.start.getX())+s.start.getY()))//above normal through 1
-					if(blob.center.getY() < (-(s.end.getX()-s.start.getX())/(s.end.getY()-s.start.getY())*(blob.center.getX()-s.end.getX())+s.end.getY()))//below normal through 2
-						if(blob.center.getY() > ((s.end.getY()-s.start.getY())/(s.end.getX()-s.start.getX())*(blob.center.getX()-s.start.getX())+s.start.getY()))//above line
-							return s;
+			if(r<blob.unstressedsize*blob.aspectratio/2)
+			{
+				double theta1a = Math.atan2(blob.center.getY()-s.start.getY(),blob.center.getX()-s.start.getX());
+				double theta1b = Math.atan2(s.end.getY()-s.start.getY(),s.end.getX()-s.start.getX());
+				double difference1 = theta1a-theta1b;
+				if(difference1 > 2*Math.PI) difference1 -= 2*Math.PI;
+				if(difference1 < 2*Math.PI) difference1 += 2*Math.PI;
+				
+				double theta2a = Math.atan2(blob.center.getY()-s.end.getY(),blob.center.getX()-s.end.getX());
+				double theta2b = Math.atan2(s.start.getY()-s.end.getY(),s.start.getX()-s.end.getX());
+				double difference2 = theta2a-theta2b;
+				if(difference2 > 2*Math.PI) difference2 -= 2*Math.PI;
+				if(difference2 < 2*Math.PI) difference2 += 2*Math.PI;
+				
+				if(Math.abs(difference1) < Math.PI/2)
+					if(Math.abs(difference2) < Math.PI/2)
+						{
+							double oldorientation = blob.orientation;
+							blob.orientation = Math.atan2((s.end.getY()-s.start.getY()),(s.end.getX()-s.start.getX()));
+							if(blob.NormalVelocity() < maxnormalvelocity)
+							{
+								bestsurface = s;
+								maxnormalvelocity=blob.NormalVelocity();
+							}
+							else blob.orientation = oldorientation;
+						}
+			}
 		}
-		return null;
+		return bestsurface;
 	}
 	
 	public boolean haswon()
