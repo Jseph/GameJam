@@ -33,5 +33,7 @@ public class Surface
 		myGraphics.fillRect(0, 0, length, 3);
 		myGraphics.setColor(Color.gray);
 		myGraphics.fillRect(0, 3, length, 3);
+		myGraphics.rotate(-theta);
+		myGraphics.translate(-(int)ms.getX(), -(int)ms.getY());
 	}
 }
