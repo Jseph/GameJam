@@ -26,6 +26,7 @@ public class PhysicsEngine
 	private boolean colliding()//checks if the blob is close to a surface, then sets the angle and flags collision for step
 	{
 		
+		return false;
 	}
 	
 	public boolean haswon()
