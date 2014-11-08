@@ -6,14 +6,15 @@ import java.util.ArrayList;
 
 public class PhysicsEngine
 {
-	private final double gravity = 10;
+	private final double gravity = 8;
 	private final double directionalinfluince = 10;
-	private final double restoringforce = 7;
+	private final double restoringforce = 10;
 	private final double MaxStrain = 4;
 	private final double tension = 10;
 	private final double DeltaT = 0.05;
 	private final double viscosity = 5;
 	
+	public boolean SpaceWasPressedWhenYouCollided = false;
 	public Level level;
 	public Blob blob;
 	
@@ -60,17 +61,25 @@ public class PhysicsEngine
 			//we would have benifited greatly by standardizing coordinate systems before starting
 			//fNormal is positive away from the surface
 			//System.out.println("Gravity "+(-gravity * Math.cos(theta)));
-			fNormal -= gravity * Math.cos(theta);
+			fNormal -= (s.hydrophobic?1:0.5)*gravity * Math.cos(theta);
 			//System.out.println("tension "+( -tension * (1-1/strain)));
-			fTan -= gravity*Math.sin(theta);
-			fNormal -= tension * (1-1/strain);
+			fTan -= (s.hydrophobic?1:0.5)*gravity*Math.sin(theta);
+			fNormal -= (s.hydrophobic?1:3)*tension * (1-0/strain);
 			//System.out.println("Restoring "+(strain * restoringforce*(SpacePressed?2:1)));
-			fNormal += strain * restoringforce*(SpacePressed?3:1);
+			if(SpaceWasPressedWhenYouCollided)
+				fNormal += (s.hydrophobic?1:1) * strain * restoringforce*((SpacePressed)?5:1);
+			else
+				fNormal += (s.hydrophobic?1:1) * strain * restoringforce*((SpacePressed && vnorm >= 0)?5:1);
 			//System.out.println("Viscosity "+(-vnorm * viscosity));
 			fNormal -= vnorm * viscosity;//This might be a little much
 			//System.out.println(fNormal+"\n");
 			vnorm += fNormal*DeltaT;
 			//System.out.println(vnorm);
+			//DI
+			fTan += (s.hydrophobic?0.3:1)*((RightPressed?1:0)+(LeftPressed?-1:0))*directionalinfluince;
+			fTan -= (s.hydrophobic?0:0.5)*viscosity*vtan;
+			
+			
 			vtan += fTan*DeltaT;
 			//System.out.println("VTAN VNORM"+vtan+" "+vnorm);
 			blob.setVelocityTanNorm(vtan, vnorm);
@@ -138,9 +147,9 @@ public class PhysicsEngine
 			double vy = blob.VelocityY;
 			vy += gravity*DeltaT;
 			if(LeftPressed)
-				vx-=directionalinfluince*DeltaT;
+				vx-=0.3*directionalinfluince*DeltaT;
 			if(RightPressed)
-				vx+=directionalinfluince*DeltaT;
+				vx+=0.3*directionalinfluince*DeltaT;
 			blob.VelocityX = vx;
 			blob.VelocityY = vy;
 			Point2D before = new Point2D.Double();
@@ -148,7 +157,7 @@ public class PhysicsEngine
 			blob.move(DeltaT);
 			Surface s;
 			
-			SurfaceColiding(before);
+			SurfaceColiding(before, SpacePressed);
 			//Calculate the collision in the collision code
 			//much cleaner that way
 			
@@ -173,7 +182,7 @@ public class PhysicsEngine
 		double by = s.end.getY() - s.start.getY();
 		return (ax*by - bx*ay)/s.end.distance(s.start);
 	}
-	private Surface SurfaceColiding(Point2D before)
+	private Surface SurfaceColiding(Point2D before, boolean sp)
 	{
 		Surface best = null;
 		double bestNVel = 999;
@@ -241,6 +250,7 @@ public class PhysicsEngine
 
 		}
 		if(best!=null) return best;
+		if(Double.isNaN(moveVec.getY2())) return null;
 		//This specifically only matches if the blob passes straight through 
 		for(Surface s:level.surfaces)
 		{
@@ -266,6 +276,9 @@ public class PhysicsEngine
 					blob.orientation = oldOrientation;
 			}
 		}
+		if(sp) SpaceWasPressedWhenYouCollided = true;
+		else SpaceWasPressedWhenYouCollided = false;
+			
 		return best;
 	}
 	
