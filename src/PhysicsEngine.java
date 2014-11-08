@@ -9,7 +9,7 @@ public class PhysicsEngine
 	private final double gravity = 10;
 	private final double directionalinfluince = 10;
 	private final double restoringforce = 7;
-	private final double MaxStrain = 2.5;
+	private final double MaxStrain = 4;
 	private final double tension = 10;
 	private final double DeltaT = 0.05;
 	private final double viscosity = 5;
@@ -79,7 +79,7 @@ public class PhysicsEngine
 			blob.move(DeltaT);			
 			double distance = findDistance(blob.center, s);
 			blob.aspectratio = blob.unstressedsize/(distance*2);
-			if(blob.aspectratio<1 || blob.aspectratio>4)
+			if(blob.aspectratio<1 || blob.aspectratio>MaxStrain)
 			{
 				System.out.println("Aspect Ratio is bad");
 				double tRest = 0;
@@ -133,18 +133,9 @@ public class PhysicsEngine
 			blob.move(DeltaT);
 			Surface s;
 			
-			if((s = SurfaceColiding(before))!=null)//Place blob right on the surface
-			{
-				blob.orientation = s.getOrientation();
-				blob.stuckSurface = s;
-				double distance = findDistance(blob.center, s);
-				//System.out.println(distance);
-				double negTime = (distance - blob.unstressedsize/2)/Math.abs(blob.NormalVelocity());
-				//System.out.println("negTime "+negTime);
-				blob.move(negTime);
-				blob.aspectratio=1.0001;
-				//finishStep(LeftPressed,RightPressed,UpPressed,DownPressed,SpacePressed,-negTime);
-			}
+			SurfaceColiding(before);
+			//Calculate the collision in the collision code
+			//much cleaner that way
 			
 		}
 		
@@ -171,15 +162,24 @@ public class PhysicsEngine
 	{
 		Surface best = null;
 		double bestNVel = 999;
-		//Collision based on current blob location (important for colided movement code)
+		before = new Point2D.Double(before.getX()+blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
+                before.getY()+blob.VelocityY * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2);
+
+		Line2D moveVec = new Line2D.Double(before,new Point2D.Double(
+				blob.center.getX() + blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
+				blob.center.getY() + blob.VelocityY * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2));
+		
+		Point2D oldCenter = new Point2D.Double();
+		oldCenter.setLocation(blob.center);
+		//Collision based on current blob location (important for collided movement code)
 		for(Surface s:level.surfaces)
 		{
-			double ax = blob.center.getX() - s.start.getX();
-			double ay = blob.center.getY() - s.start.getY();
+			double ax = oldCenter.getX() - s.start.getX();
+			double ay = oldCenter.getY() - s.start.getY();
 			double bx = s.end.getX() - s.start.getX();
 			double by = s.end.getY() - s.start.getY();
-			double cx = blob.center.getX() - s.end.getX();
-			double cy = blob.center.getY() - s.end.getY();
+			double cx = oldCenter.getX() - s.end.getX();
+			double cy = oldCenter.getY() - s.end.getY();
 			double aCrossB = ax*by - bx*ay;
 			if(aCrossB < 0)
 				continue;
@@ -198,17 +198,34 @@ public class PhysicsEngine
 				System.out.println("COLIDING SURFACE REALLY");
 				best = s;
 				bestNVel=blob.NormalVelocity();
+				double distance = findDistance(oldCenter, s);
+				blob.stuckSurface = s;
+				if(distance > blob.unstressedsize/2/MaxStrain)
+				{
+					blob.aspectratio = blob.unstressedsize/2/distance;
+					System.out.println("Badness is here");
+				}
+				else
+				{
+					System.out.println("Nope it's here");
+					blob.aspectratio = MaxStrain;
+					Line2D surface = s.lineRep;
+					Point2D intersection = getIntersection(surface, moveVec);
+					blob.center.setLocation(
+						intersection.getX()-blob.VelocityX * (blob.unstressedsize/MaxStrain)/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
+						intersection.getY()-blob.VelocityY * (blob.unstressedsize/MaxStrain)/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2);
+					//blob.setVelocityTanNorm(0, 0);
+					blob.aspectratio = MaxStrain;
+					blob.stuckSurface = s;
+				}
 			}
-			blob.orientation = oldorientation;
+			else
+			{
+				blob.orientation = oldorientation;
+			}
 
 		}
-		before = new Point2D.Double(before.getX()+blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
-				                    before.getY()+blob.VelocityY * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2);
-		
-		Line2D moveVec = new Line2D.Double(before,new Point2D.Double(
-				blob.center.getX() + blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
-				blob.center.getY() + blob.VelocityY * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2));
-		
+		if(best!=null) return best;
 		//This specifically only matches if the blob passes straight through 
 		for(Surface s:level.surfaces)
 		{
@@ -220,10 +237,18 @@ public class PhysicsEngine
 				if(blob.NormalVelocity()<bestNVel)
 				{
 					bestNVel = blob.NormalVelocity();
-					
-					//Determine when it collided in deltat sense
-					
+					//Shift the blob back to where it belongs
+					Point2D intersection = getIntersection(surface, moveVec);
+					blob.center.setLocation(
+						intersection.getX()-blob.VelocityX * (blob.unstressedsize/MaxStrain)/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
+						intersection.getY()-blob.VelocityY * (blob.unstressedsize/MaxStrain)/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2);
+					//blob.setVelocityTanNorm(0, 0);
+					blob.aspectratio = MaxStrain;
+					blob.stuckSurface = s;
+					System.out.println("prevented fall trough");
 				}
+				else
+					blob.orientation = oldOrientation;
 			}
 		}
 		return best;
