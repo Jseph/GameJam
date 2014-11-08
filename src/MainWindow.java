@@ -17,6 +17,7 @@ public class MainWindow extends JFrame implements KeyListener
 	DrawingState ds;
 	BufferedImage buffer;
 	boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
+	Level l;
 	public MainWindow()
 	{
 		super("DRoP");
@@ -24,8 +25,10 @@ public class MainWindow extends JFrame implements KeyListener
 		xSize = (int)tk.getScreenSize().getWidth();
 		ySize = (int)tk.getScreenSize().getHeight();
 		buffer = new BufferedImage(xSize, ySize, BufferedImage.TYPE_4BYTE_ABGR);
-		Level l = new Level(0);
-		pe = new PhysicsEngine(l,new Blob(1,l.startPoint));
+		l = new Level(0);
+		Point2D p = new Point2D.Double();
+		p.setLocation(l.startPoint);
+		pe = new PhysicsEngine(l,new Blob(1,p));
 		GraphicsDevice myDevice = this.getGraphicsConfiguration().getDevice();
 		setSize(xSize,ySize);
 		setUndecorated(true);
@@ -36,7 +39,7 @@ public class MainWindow extends JFrame implements KeyListener
 			myDevice.setFullScreenWindow(null);
 			
 		}*/
-		ds = new DrawingState(xSize, ySize, 10, 0, 0);
+		ds = new DrawingState(xSize, ySize, 50, 0, 0);
 		this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
 		done = false;
 		Thread renderThread = new Thread(new Runnable() {
@@ -125,6 +128,12 @@ public class MainWindow extends JFrame implements KeyListener
 			rightPressed = true;
 		if(e.getKeyCode()==e.VK_SPACE)
 			spacePressed = true;
+		if(e.getKeyCode()==e.VK_R)
+		{
+			Point2D p = new Point2D.Double();
+			p.setLocation(l.startPoint);
+			pe = new PhysicsEngine(l, new Blob(1, p));
+		}
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
