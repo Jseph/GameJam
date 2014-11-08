@@ -1,17 +1,20 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.*;
 public class Surface 
 {
 	Point2D start;
 	Point2D end;
+	Line2D lineRep;
 	boolean hydrophobic;
 	public Surface(Point2D start, Point2D end, boolean hydrophobic)
 	{
 		this.start = start;
 		this.end = end;
 		this.hydrophobic = hydrophobic;
+		this.lineRep = new Line2D.Double(start,end);
 	}
 	public void drawSelf(Graphics2D myGraphics, DrawingState ds) 
 	{
