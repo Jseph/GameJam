@@ -30,8 +30,8 @@ public class Surface
 			myGraphics.setColor(Color.red);
 		else
 			myGraphics.setColor(Color.green);
-		myGraphics.drawRect(0, 0, length, 3);
+		myGraphics.fillRect(0, 0, length, 3);
 		myGraphics.setColor(Color.gray);
-		myGraphics.drawRect(0, 3, length, 3);
+		myGraphics.fillRect(0, 3, length, 3);
 	}
 }

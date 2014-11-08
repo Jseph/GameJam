@@ -14,6 +14,7 @@ public class Level
 	{
 		String levelPath = "level"+number+".dat";
 		surfaces = new ArrayList<Surface>();
+		actors = new ArrayList<Actor>();
 		try
 		{
 			Scanner scan = new Scanner(new File(levelPath));
