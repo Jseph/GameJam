@@ -89,6 +89,7 @@ public class MainWindow extends JFrame implements KeyListener
 		//put the graphics state back to where it was
 		//I have no idea if this will work
 		myGraphics.rotate(b.orientation);
+		System.out.println(blobLoc);
 		myGraphics.translate(-(int)blobLoc.getX(), -(int)blobLoc.getY());
 		//Draw everything else... or actually enable them to draw themselves
 		for(Surface s: l.surfaces)
@@ -108,6 +109,7 @@ public class MainWindow extends JFrame implements KeyListener
 	}
 	public static void main(String[] args) 
 	{
+		System.out.println((int)Double.NaN);
 		MainWindow mw = new MainWindow();
 		Blob b = new Blob(2, new Point2D.Double());
 		b.orientation = Math.PI/6;
