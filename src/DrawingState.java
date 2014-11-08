@@ -46,10 +46,10 @@ public class DrawingState
 		if(lx + (rx-lx)/4 > center.getX())
 			topLeftX = center.getX() - (rx-lx)/4;
 		if(lx + (rx-lx)*3/4 < center.getX())
-			topLeftX = center.getX() + (rx-lx)/4;
-		if(ty + (by - ty)/4 > center.getY());
+			topLeftX = center.getX() - (rx-lx)*3/4;
+		if(ty + (by - ty)/4 > center.getY())
 			topLeftY = center.getY() - (by-ty)/4;
 		if(ty + (by-ty)*3/4 < center.getY())
-			topLeftY = center.getY() + (by-ty)/4;
+			topLeftY = center.getY() - (by-ty)*3/4;
 	}
 }
