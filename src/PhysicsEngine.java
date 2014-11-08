@@ -1,6 +1,7 @@
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 //import java.util.*;
 
@@ -15,6 +16,7 @@ public class PhysicsEngine
 	private final double viscosity = 5;
 	
 	public boolean SpaceWasPressedWhenYouCollided = false;
+	public ArrayList<Boolean> SpaceHistory = new ArrayList<Boolean>(Arrays.asList(false, false, false));
 	public Level level;
 	public Blob blob;
 	
@@ -26,6 +28,8 @@ public class PhysicsEngine
 	
 	public synchronized void step(boolean LeftPressed, boolean RightPressed, boolean UpPressed, boolean DownPressed, boolean SpacePressed)
 	{
+		SpaceHistory.add(SpacePressed);
+		SpaceHistory.remove(0);
 		if(blob.aspectratio > 4)
 		{
 			Surface s;
@@ -162,7 +166,21 @@ public class PhysicsEngine
 			//much cleaner that way
 			
 		}
-		
+		if(blob.aspectratio > 4)
+		{
+			Surface s;
+			if((s = SurfaceColiding())!=null)
+			{
+				blob.orientation = s.getOrientation();
+				blob.stuckSurface = s;
+				double distance = findDistance(blob.center, s);
+				//System.out.println(distance);
+				double needtomove = blob.unstressedsize/8-distance;
+				//System.out.println("negTime "+negTime);
+				blob.center.setLocation(blob.center.getX()-needtomove*Math.sin(blob.orientation),blob.center.getY()-needtomove*Math.cos(blob.orientation));
+				blob.aspectratio=4;
+			}
+		}
 		
 	}
 	
@@ -276,8 +294,8 @@ public class PhysicsEngine
 					blob.orientation = oldOrientation;
 			}
 		}
-		if(sp) SpaceWasPressedWhenYouCollided = true;
-		else SpaceWasPressedWhenYouCollided = false;
+		if(SpaceHistory.contains(false)) SpaceWasPressedWhenYouCollided = false;
+		else SpaceWasPressedWhenYouCollided = true;
 			
 		return best;
 	}
