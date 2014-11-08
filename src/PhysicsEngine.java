@@ -25,6 +25,21 @@ public class PhysicsEngine
 	
 	public synchronized void step(boolean LeftPressed, boolean RightPressed, boolean UpPressed, boolean DownPressed, boolean SpacePressed)
 	{
+		if(blob.aspectratio > 4)
+		{
+			Surface s;
+			if((s = SurfaceColiding())!=null)
+			{
+				blob.orientation = s.getOrientation();
+				blob.stuckSurface = s;
+				double distance = findDistance(blob.center, s);
+				//System.out.println(distance);
+				double needtomove = blob.unstressedsize/8-distance;
+				//System.out.println("negTime "+negTime);
+				blob.center.setLocation(blob.center.getX()-needtomove*Math.sin(blob.orientation),blob.center.getY()-needtomove*Math.cos(blob.orientation));
+				blob.aspectratio=4;
+			}
+		}
 		//here, check if you are coliding with special things, like hazards, (other things if there are any), or the winning box
 		if(blob.aspectratio!= 1)
 		{
