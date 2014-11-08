@@ -88,7 +88,7 @@ public class PhysicsEngine
 				//System.out.println("Somehow Got Here");
 				if(findDistance(blob.center,s)+ vnorm*DeltaT >= blob.unstressedsize/2)
 				{
-					System.out.println("Blob has left ground");
+					//System.out.println("Blob has left ground");
 					//blob has successfully bounced off the ground
 					//must leave a little velocity behind to take off
 					double tSize = (blob.unstressedsize/2 - findDistance(blob.center, s))/vnorm;
@@ -105,7 +105,7 @@ public class PhysicsEngine
 			blob.aspectratio = blob.unstressedsize/(distance*2);
 			if(blob.aspectratio<1 || blob.aspectratio>MaxStrain)
 			{
-				System.out.println("Aspect Ratio is bad");
+				//System.out.println("Aspect Ratio is bad");
 				double tRest = 0;
 				while(blob.aspectratio<1 || blob.aspectratio>4)
 				{
@@ -115,7 +115,7 @@ public class PhysicsEngine
 					blob.aspectratio = blob.unstressedsize/(distance*2);
 				}
 				blob.setVelocityTanNorm(blob.TangentalVelocity(), 0);
-				System.out.println(tRest);
+				//System.out.println(tRest);
 				//finishStep(LeftPressed,RightPressed,UpPressed,DownPressed,SpacePressed,tRest);
 			}
 			//Should check to see if it rolled off surface or onto another one here.
@@ -132,14 +132,14 @@ public class PhysicsEngine
 				}
 				else
 				{
-					System.out.println("Shifting");
+					//System.out.println("Shifting");
 					blob.orientation = newS.getOrientation();
 					blob.stuckSurface = newS;
 					distance = findDistance(blob.center, newS);
 					blob.aspectratio = blob.unstressedsize/(distance*2);
 				}
 			}
-			System.out.println("......");
+			//System.out.println("......");
 		}
 		else
 		{
@@ -219,7 +219,7 @@ public class PhysicsEngine
 			//System.out.println(blob.NormalVelocity());
 			if(blob.NormalVelocity() < bestNVel)
 			{
-				System.out.println("COLIDING SURFACE REALLY");
+				//System.out.println("COLIDING SURFACE REALLY");
 				best = s;
 				bestNVel=blob.NormalVelocity();
 				double distance = findDistance(oldCenter, s);
@@ -227,11 +227,11 @@ public class PhysicsEngine
 				if(distance > blob.unstressedsize/2/MaxStrain)
 				{
 					blob.aspectratio = blob.unstressedsize/2/distance;
-					System.out.println("Badness is here");
+					//System.out.println("Badness is here");
 				}
 				else
 				{
-					System.out.println("Nope it's here");
+					//System.out.println("Nope it's here");
 					blob.aspectratio = MaxStrain;
 					Line2D surface = s.lineRep;
 					Point2D intersection = getIntersection(surface, moveVec);
@@ -270,7 +270,7 @@ public class PhysicsEngine
 					//blob.setVelocityTanNorm(0, 0);
 					blob.aspectratio = MaxStrain;
 					blob.stuckSurface = s;
-					System.out.println("prevented fall trough");
+					//System.out.println("prevented fall trough");
 				}
 				else
 					blob.orientation = oldOrientation;
@@ -332,7 +332,7 @@ public class PhysicsEngine
 			//System.out.println(blob.NormalVelocity());
 			if(blob.NormalVelocity() < maxnormalvelocity)
 			{
-				System.out.println("COLIDING SURFACE REALLY");
+				//System.out.println("COLIDING SURFACE REALLY");
 				bestsurface = s;
 				maxnormalvelocity=blob.NormalVelocity();
 			}
