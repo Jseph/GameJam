@@ -2,11 +2,11 @@ import java.util.*;
 
 public class PhysicsEngine
 {
-	private final int maxspeed = 1;
-	private final int gravity = 1;
-	private final int directionalinfluince = 1;
-	private final int dampening = 1;
-	private final int restoringforce = 1;
+	private final int maxspeed = 20;
+	private final int gravity = 10;
+	private final int directionalinfluince = 10;
+	private final int dampening = 3;
+	private final int restoringforce = 10;
 	
 	
 	public Level level;
@@ -18,9 +18,21 @@ public class PhysicsEngine
 		blob = b;
 	}
 	
-	public void step()
+	public void step(boolean LeftPressed, boolean RightPressed, boolean SpacePressed)
 	{
-		double netforce = 0;
+		double NetForceDown = 0;
+		double NetForceRight = 0;
+		if(colliding())
+		{
+			
+			
+		}
+		else
+		{
+			NetForceDown += gravity;
+			if()
+			NetForceRight += 0.2*directionalinfluince*((int)RightPressed-(int)LeftPressed);
+		}
 	}
 	
 	private boolean colliding()//checks if the blob is close to a surface, then sets the angle and flags collision for step
