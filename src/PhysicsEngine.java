@@ -16,7 +16,7 @@ public class PhysicsEngine
 	private final double viscosity = 5;
 	
 	public boolean SpaceWasPressedWhenYouCollided = false;
-	public ArrayList<Boolean> SpaceHistory = new ArrayList<Boolean>(Arrays.asList(false, false, false));
+	public ArrayList<Boolean> SpaceHistory = new ArrayList<Boolean>(Arrays.asList(false, false, false, false, false, false));
 	public Level level;
 	public Blob blob;
 	public boolean justJumped;
