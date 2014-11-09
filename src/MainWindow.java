@@ -102,7 +102,7 @@ public class MainWindow extends JFrame implements KeyListener
 		myGraphics.drawImage(backgroundImage, -(((int)(ds.topLeftX*ds.zoomLevel/fgbgratio+Integer.MAX_VALUE/2))%bgTileSize), -(((int)(ds.topLeftY*ds.zoomLevel/fgbgratio + Integer.MAX_VALUE/2))%bgTileSize), this);
 		//myGraphics.setPaint(foregroundPaint);
 		//myGraphics.fillRect(4, 4, 800, 800);
-		Level l = pe.level;
+		Level l = pe.level; 
 		Blob b = pe.blob;
 		ds.keepInMiddleBox(b.center);
 		myGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
