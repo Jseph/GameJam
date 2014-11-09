@@ -23,7 +23,7 @@ public class PhysicsEngine
 	public PhysicsEngine(Level l, Blob b)
 	{
 		level = l;
-		blob = b;
+		blob = b; 
 	}
 	
 	public synchronized void step(boolean LeftPressed, boolean RightPressed, boolean UpPressed, boolean DownPressed, boolean SpacePressed)
