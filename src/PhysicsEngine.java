@@ -126,8 +126,9 @@ public class PhysicsEngine
 			{
 				//System.out.println("Aspect Ratio is bad");
 				double tRest = 0;
-				while(blob.aspectratio<1 || blob.aspectratio>4)
+				for(int i = 0; i < 100; i++)
 				{
+					if(!(blob.aspectratio<1 || blob.aspectratio>4)) break;
 					blob.move(-DeltaT*.05);
 					tRest+=0.05;
 					distance = findDistance(blob.center, s);
