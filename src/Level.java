@@ -25,6 +25,36 @@ public class Level
 			double endY1 = scan.nextDouble();
 			double endX2 = scan.nextDouble();
 			double endY2 = scan.nextDouble();
+			endBox = new Rectangle2D.Double(Math.min(endX1, endX2), Math.min(endY1, endY2), Math.abs(endX1-endX2), Math.abs(endY1-endY2));
+			int numSurfaces = scan.nextInt();
+			for(int i=0; i<numSurfaces; i++)
+			{
+				double sx = scan.nextDouble();
+				double sy = scan.nextDouble();
+				double ex = scan.nextDouble();
+				double ey = scan.nextDouble();
+				surfaces.add(new Surface(new Point2D.Double(sx, sy), new Point2D.Double(ex, ey), scan.nextBoolean()));
+			}
+			System.out.println("...."+endBox.getX());
+			int numActors = scan.nextInt();
+			for(int i=0; i<numActors; i++)
+				Actor.getActor(scan);
+		}catch (Exception e){System.out.println("Something went wrong reading input file "+levelPath+ "\n" + e);}
+	}
+	public Level(String levelPath)
+	{
+		surfaces = new ArrayList<Surface>();
+		actors = new ArrayList<Actor>();
+		try
+		{
+			Scanner scan = new Scanner(new File(levelPath));
+			double startX = scan.nextDouble();
+			double startY = scan.nextDouble();
+			startPoint = new Point2D.Double(startX,startY);
+			double endX1 = scan.nextDouble();
+			double endY1 = scan.nextDouble();
+			double endX2 = scan.nextDouble();
+			double endY2 = scan.nextDouble();
 			endBox = new Rectangle2D.Double(endX1, endY1, endX2, endY2);
 			int numSurfaces = scan.nextInt();
 			for(int i=0; i<numSurfaces; i++)

@@ -167,6 +167,11 @@ public class MainWindow extends JFrame implements KeyListener
 		{
 			a.drawSelf((Graphics2D) myGraphics, ds);
 		}
+		g.setColor(new Color(0.6f, .8f, .8f, 0));
+		g.setColor(Color.RED);
+		System.out.println(l.endBox.getX());
+		Point2D topLeft = ds.mapPoint(new Point2D.Double(l.endBox.getX(),l.endBox.getY()));
+		g.fillRect((int)topLeft.getX(), (int)topLeft.getY(), (int)(ds.zoomLevel*l.endBox.getWidth()),(int)( ds.zoomLevel*l.endBox.getHeight()));
 		g.drawImage(buffer, 0, 0, this);
 		pe.step(leftPressed, rightPressed, upPressed, downPressed, spacePressed);
 
@@ -194,6 +199,11 @@ public class MainWindow extends JFrame implements KeyListener
 			rightPressed = true;
 		if(e.getKeyCode()==e.VK_SPACE)
 			spacePressed = true;
+		if(e.getKeyCode()==e.VK_ENTER)
+		{
+			cLevel++;
+			loadLevel();
+		}
 		if(e.getKeyCode()==e.VK_R)
 		{
 			if(!debug)
@@ -254,21 +264,54 @@ public class MainWindow extends JFrame implements KeyListener
 			if(state == GameState.MAIN_MENU)
 			{
 				state = GameState.INFO_SCREEN;
-				cLevel = 1;
+				cLevel = 6;
 				loadInfo();
+				System.out.println("Loading info");
+				return;
+			}
+			if(state == GameState.INFO_SCREEN)
+			{
+				System.out.println("loadLevel");
+				loadLevel();
+				state = GameState.PLAY_LEVEL;
+				return;
 			}
 			spacePressed = false;
 		}
 		if(e.getKeyCode()==e.VK_NUMPAD0)
 			zeroPressed = false;
 	}
-	private void loadInfo() {
-		// TODO Auto-generated method stub
-		
+	private void loadLevel() 
+	{
+		if(cLevel>numTutorials)
+			l = new Level(cLevel-1-numTutorials);
+		else
+			l = new Level("tutorial "+cLevel+".dat");
+		Point2D startLoc = new Point2D.Double();
+		startLoc.setLocation(l.startPoint);
+		pe = new PhysicsEngine(l, new Blob(1,startLoc));
+		state = GameState.PLAY_LEVEL;
+	}
+	private void loadInfo() 
+	{
+		if(cLevel>numTutorials)
+		{
+			l = new Level(cLevel-1-numTutorials);
+			Point2D startLoc = new Point2D.Double();
+			startLoc.setLocation(l.startPoint);
+			pe = new PhysicsEngine(l, new Blob(1,startLoc));
+			state = GameState.PLAY_LEVEL;
+			return;
+		}
+		Image i = new ImageIcon("tutorial "+cLevel+" text.png").getImage();
+		buffer.getGraphics().drawImage(i, 0, 0, xSize, ySize, null);
+		System.out.println(" "+xSize+" "+ySize);
+		state = GameState.INFO_SCREEN;
 	}
 	@Override
-	public void keyTyped(KeyEvent e) {
-
+	public void keyTyped(KeyEvent e) 
+	{
+		
 	}
 
 }
