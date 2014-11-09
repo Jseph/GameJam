@@ -1,5 +1,5 @@
 #!/bin/bash
 make $1.dat
-cat $1.dat > ../../level0.dat
+cat $1.dat > ../../level2.dat
 cd ../..
 make run
