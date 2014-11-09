@@ -44,7 +44,7 @@ public class MainWindow extends JFrame implements KeyListener
 		xSize = (int)tk.getScreenSize().getWidth();
 		ySize = (int)tk.getScreenSize().getHeight();
 		buffer = new BufferedImage(xSize, ySize, BufferedImage.TYPE_4BYTE_ABGR);
-		l = new Level(0);
+		l = new Level(2);
 		Point2D p = new Point2D.Double();
 		p.setLocation(l.startPoint);
 		pe = new PhysicsEngine(l,new Blob(1,p));
