@@ -2,6 +2,7 @@
 
 import xml.etree.ElementTree as ET
 import sys
+import math
 
 path = '{http://www.w3.org/2000/svg}path'
 rect = '{http://www.w3.org/2000/svg}rect'
@@ -47,16 +48,27 @@ def getlines(r,s):
         cur=seq[0]
         seq=seq[1:]
         for p in seq:
-            out.append((cur[0],cur[1],p[0],p[1],"true" if phobic else "false"))
+            out.append((extendline((cur[0],cur[1],p[0],p[1])),
+                "true" if phobic else "false"))
             cur = p
     return out
+
+grace = .1
+def extendline(l):
+    dx=l[2]-l[0]
+    dy=l[3]-l[1]
+    ds=math.sqrt(dx*dx+dy*dy)
+    dx /= ds
+    dy /= ds
+    return (l[0]-dx*grace,l[1]-dy*grace,l[2]+dx*grace,l[3]+dy*grace)
+
 
 def p(start,end,lines):
     print(start[0],start[1])
     print(end[0],end[1],end[2],end[3])
     print(len(lines))
     for l in lines:
-        print(l[0],l[1],l[2],l[3],l[4])
+        print(l[0][0],l[0][1],l[0][2],l[0][3],l[1])
     print(0)
  
 def isstyred(sty):
