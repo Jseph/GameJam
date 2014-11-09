@@ -65,17 +65,17 @@ public class PhysicsEngine
 			//we would have benifited greatly by standardizing coordinate systems before starting
 			//fNormal is positive away from the surface
 			//System.out.println("Gravity "+(-gravity * Math.cos(theta)));
-			fNormal -= (s.hydrophobic?1:0.5)*gravity * Math.cos(theta);
+			fNormal -= (s.hydrophobic?1:0.3)*gravity * Math.cos(theta);
 			//System.out.println("tension "+( -tension * (1-1/strain)));
-			fTan -= (s.hydrophobic?1:0.5)*gravity*Math.sin(theta);
-			fNormal -= (s.hydrophobic?1:3)*tension * (1-0/strain);
+			fTan -= (s.hydrophobic?1:0.3)*gravity*Math.sin(theta);
+			fNormal -= (s.hydrophobic?1:3)*tension;
 			//System.out.println("Restoring "+(strain * restoringforce*(SpacePressed?2:1)));
 			if(SpaceWasPressedWhenYouCollided)
 				fNormal += (s.hydrophobic?1:1) * strain * restoringforce*((SpacePressed)?5:1);
 			else
 				fNormal += (s.hydrophobic?1:1) * strain * restoringforce*((SpacePressed && vnorm >= 0)?5:1);
 			//System.out.println("Viscosity "+(-vnorm * viscosity));
-			fNormal -= vnorm * viscosity;//This might be a little much
+			fNormal -= vnorm * 0.7 * viscosity;//This might be a little much
 			//System.out.println(fNormal+"\n");
 			vnorm += fNormal*DeltaT;
 			//System.out.println(vnorm);
