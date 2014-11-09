@@ -7,15 +7,20 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 
+enum GameState{MAIN_MENU, LEVEL_SELECT, INFO_SCREEN, PLAY_LEVEL, PAUSE_SCREEN, LEVEL_EDITOR}
 
 public class MainWindow extends JFrame implements KeyListener
 {
+	public static final double fgbgratio = 4;
 	int xSize, ySize;
 	boolean done;
 	GraphicsEngine ge;
 	PhysicsEngine pe;
 	DrawingState ds;
 	BufferedImage buffer;
+	BufferedImage backgroundImage; 
+	Image bgTile;
+	int bgTileSize;
 	boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
 	Level l;
 	public MainWindow()
@@ -31,45 +36,62 @@ public class MainWindow extends JFrame implements KeyListener
 		pe = new PhysicsEngine(l,new Blob(1,p));
 		GraphicsDevice myDevice = this.getGraphicsConfiguration().getDevice();
 		setSize(xSize,ySize);
+		bgTile = new ImageIcon("res/textures/backtile.png").getImage();
+		bgTileSize = bgTile.getHeight(this);
+		backgroundImage = new BufferedImage(xSize+bgTileSize*2, ySize+bgTileSize*2, BufferedImage.TYPE_3BYTE_BGR);
+		Graphics g = backgroundImage.getGraphics();
+		for(int i=0; i<xSize/bgTileSize+2; i++)
+			for(int j=0; j<ySize/bgTileSize+2; j++)
+				g.drawImage(bgTile, i*bgTileSize, j*bgTileSize, bgTileSize, bgTileSize, this);
+		//backgroundImage.flush();
 		setUndecorated(true);
 		this.setVisible(true);
-		/*try{
-			myDevice.setFullScreenWindow(this);
-		}catch(Exception e){
-			myDevice.setFullScreenWindow(null);
-			
-		}*/
 		ds = new DrawingState(xSize, ySize, 50, 0, 0);
 		this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
 		done = false;
+		//PlaySound woosh = new PlaySound(PlaySound.FAST, true, 0);
 		Thread renderThread = new Thread(new Runnable() {
 			public void run() {
 				while(true)
 				{
-					//try {Thread.sleep(10);} catch (InterruptedException e) {}
-					//repaint();// wasn't working so I put this here...
-					paint((Graphics2D) getContentPane().getGraphics());
+					paintLevel((Graphics2D) getContentPane().getGraphics());
 				}
 			}
 		});
+		Thread soundEffects = new Thread(new Runnable() {
+			public void run() {
+				int jumpNum = 0;
+				double theta = 0;
+				while(true)
+				{
+					try {Thread.sleep(10);} catch (InterruptedException e) {}
+					if(pe.justJumped)
+					{
+						new PlaySound(PlaySound.JUMPSTART+jumpNum++, false);
+						jumpNum = jumpNum%PlaySound.NUMJUMPS;
+						pe.justJumped = false;
+					}
+					theta += .05;
+					//woosh.volume = Math.abs(Math.cos(theta));
+				}
+			}
+		});
+		soundEffects.start();
 		addKeyListener(this);
 		renderThread.start();
+		new PlaySound(PlaySound.MAINLOOP, true);
 	}
-	public void paint(Graphics2D g)
+	public void paintLevel(Graphics2D g)
 	{
-		//while (!done)
-		//{
-			//Should probably implement double buffering here...
-			//Graphics2D myGraphics = (Graphics2D) this.getContentPane().getGraphics();
 		long ts = System.currentTimeMillis();
-		Graphics2D myGraphics = (Graphics2D) buffer.getGraphics(); 
+		Graphics2D myGraphics = (Graphics2D) buffer.getGraphics();
+		myGraphics.drawImage(backgroundImage, -(((int)(ds.topLeftX*ds.zoomLevel/fgbgratio+Integer.MAX_VALUE/2))%bgTileSize), -(((int)(ds.topLeftY*ds.zoomLevel/fgbgratio + Integer.MAX_VALUE/2))%bgTileSize), this);
 		Level l = pe.level;
 		Blob b = pe.blob;
-		//System.out.println(b.center);
 		ds.keepInMiddleBox(b.center);
 		//Removing the previous rendered frame
-		myGraphics.setColor(Color.black);
-		myGraphics.fillRect(0, 0, ds.width, ds.height);
+		//myGraphics.setColor(Color.black);
+		//myGraphics.fillRect(0, 0, ds.width, ds.height);
 		//Here is some goofy stuff I found online, not sure what it actually does
 		myGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    myGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -89,7 +111,7 @@ public class MainWindow extends JFrame implements KeyListener
 		//put the graphics state back to where it was
 		//I have no idea if this will work
 		myGraphics.rotate(b.orientation);
-		System.out.println(blobLoc);
+		//System.out.println(blobLoc);
 		myGraphics.translate(-(int)blobLoc.getX(), -(int)blobLoc.getY());
 		//Draw everything else... or actually enable them to draw themselves
 		for(Surface s: l.surfaces)
@@ -101,11 +123,8 @@ public class MainWindow extends JFrame implements KeyListener
 			a.drawSelf((Graphics2D) myGraphics, ds);
 		}
 		g.drawImage(buffer, 0, 0, this);
-		//public void step(boolean LeftPressed, boolean RightPressed, boolean UpPressed, boolean DownPressed, boolean SpacePressed)
-
 		pe.step(leftPressed, rightPressed, upPressed, downPressed, spacePressed);
-		//System.out.println(1000/(System.currentTimeMillis()-ts));
-		//}
+
 	}
 	public static void main(String[] args) 
 	{
