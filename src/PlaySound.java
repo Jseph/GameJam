@@ -7,7 +7,7 @@ public class PlaySound implements Runnable
 	static
 	{
 		files = new String[40];
-		files[0] = "res/mainLoopQQ.wav";
+		files[0] = "res/underclocked.wav";
 		files [1] = "res/start.wav";
 		files [2] = "res/fast.wav";
 		for(int i=0; i<32; i++)
