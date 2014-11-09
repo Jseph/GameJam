@@ -28,6 +28,8 @@ public class MainWindow extends JFrame implements KeyListener
 	Image mainMenu;
 	TexturePaint foregroundPaint;
 	int bgTileSize;
+	int numTutorials = 5;
+	int cLevel;
 	boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
 	boolean zeroPressed;
 	int debugSleepTime = 10;
@@ -87,8 +89,11 @@ public class MainWindow extends JFrame implements KeyListener
 							e.printStackTrace();
 						}
 					}
-					if(debug) try{Thread.sleep(debugSleepTime);}catch(Exception e){}
-					if(!debug || zeroPressed) paintLevel((Graphics2D) getContentPane().getGraphics());
+					if(state == GameState.PLAY_LEVEL)
+					{
+						if(debug) try{Thread.sleep(debugSleepTime);}catch(Exception e){}
+						if(!debug || zeroPressed) paintLevel((Graphics2D) getContentPane().getGraphics());
+					}
 				}
 			}
 
@@ -249,11 +254,17 @@ public class MainWindow extends JFrame implements KeyListener
 			if(state == GameState.MAIN_MENU)
 			{
 				state = GameState.INFO_SCREEN;
+				cLevel = 1;
+				loadInfo();
 			}
 			spacePressed = false;
 		}
 		if(e.getKeyCode()==e.VK_NUMPAD0)
 			zeroPressed = false;
+	}
+	private void loadInfo() {
+		// TODO Auto-generated method stub
+		
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {
