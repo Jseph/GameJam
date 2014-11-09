@@ -34,7 +34,7 @@ public class PhysicsEngine
 	{
 		SpaceHistory.add(SpacePressed);
 		SpaceHistory.remove(0);
-		if(blob.aspectratio > 4)
+		/*if(blob.aspectratio > 4)
 		{
 			Surface s;
 			if((s = SurfaceColiding())!=null)
@@ -48,7 +48,7 @@ public class PhysicsEngine
 				blob.center.setLocation(blob.center.getX()-needtomove*Math.sin(blob.orientation),blob.center.getY()-needtomove*Math.cos(blob.orientation));
 				blob.aspectratio=4;
 			}
-		}
+		}*/
 		//here, check if you are coliding with special things, like hazards, (other things if there are any), or the winning box
 		if(blob.aspectratio!= 1)
 		{
@@ -142,23 +142,7 @@ public class PhysicsEngine
 			//Note that this is still basically undefined behavior
 			Surface newS;
 			//System.out.println("......");
-			if((newS = SurfaceColiding())!=s)
-			{
-				//System.out.println("In here");
-				if(newS == null)
-				{
-					blob.freeFromSurface();
-					//System.out.println("IM FREE!");
-				}
-				else
-				{
-					//System.out.println("Shifting");
-					blob.orientation = newS.getOrientation();
-					blob.stuckSurface = newS;
-					distance = findDistance(blob.center, newS);
-					blob.aspectratio = blob.unstressedsize/(distance*2);
-				}
-			}
+			SurfaceColiding(blob.center, true);
 			//System.out.println("......");
 		}
 		else
@@ -182,7 +166,7 @@ public class PhysicsEngine
 			//much cleaner that way
 			
 		}
-		if(blob.aspectratio > 4)
+		/*if(blob.aspectratio > 4)
 		{
 			Surface s;
 			if((s = SurfaceColiding())!=null)
@@ -196,7 +180,7 @@ public class PhysicsEngine
 				blob.center.setLocation(blob.center.getX()-needtomove*Math.sin(blob.orientation),blob.center.getY()-needtomove*Math.cos(blob.orientation));
 				blob.aspectratio=4;
 			}
-		}
+		}*/
 		
 	}
 	
@@ -220,12 +204,12 @@ public class PhysicsEngine
 	{
 		Surface best = null;
 		double bestNVel = 999;
-		/*before = new Point2D.Double(before.getX()+blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
+		before = new Point2D.Double(before.getX()+blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
                 before.getY()+blob.VelocityY * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2);
-		 */
+		 
 		//Was based on the leading edge of the blob, now is set back to the center of the blob for
 		//more robust collision detection
-		before = new Point2D.Double(before.getX(),before.getY());
+		//before = new Point2D.Double(before.getX(),before.getY());
 		Line2D moveVec = new Line2D.Double(before,new Point2D.Double(
 				blob.center.getX() + blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
 				blob.center.getY() + blob.VelocityY * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2));
@@ -268,14 +252,16 @@ public class PhysicsEngine
 				}
 				else
 				{
-					//System.out.println("Nope it's here");
+					System.out.println("Nope it's here");
 					blob.aspectratio = MaxStrain;
 					Line2D surface = s.lineRep;
 					Point2D intersection = getIntersection(surface, moveVec);
+					if(intersection == null)
+						intersection = blob.center;
 					blob.center.setLocation(
 						intersection.getX()-blob.VelocityX * (blob.unstressedsize/MaxStrain)/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
 						intersection.getY()-blob.VelocityY * (blob.unstressedsize/MaxStrain)/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2);
-					//blob.setVelocityTanNorm(0, 0);
+						//blob.setVelocityTanNorm(0, 0);
 					blob.aspectratio = MaxStrain;
 					blob.stuckSurface = s;
 				}
@@ -286,9 +272,14 @@ public class PhysicsEngine
 			}
 
 		}
-		if(best!=null) return best;//Might be a culprit... Hard to say
-		if(Double.isNaN(moveVec.getY2())) return null;
-		//This specifically only matches if the blob passes straight through 
+		////Might be a culprit... Hard to say
+		if(Double.isNaN(moveVec.getY2()))
+		{
+			if(best!=null) return best;
+			return null;
+		}
+		//This specifically only matches if the blob passes straight through
+		System.out.println();
 		for(Surface s:level.surfaces)
 		{
 			Line2D surface = s.lineRep;

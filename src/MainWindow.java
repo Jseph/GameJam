@@ -15,6 +15,7 @@ public class MainWindow extends JFrame implements KeyListener
 	public static final double fgbgratio = 4;
 	int xSize, ySize;
 	boolean done;
+	boolean debug = false;
 	GraphicsEngine ge;
 	PhysicsEngine pe;
 	DrawingState ds;
@@ -24,9 +25,14 @@ public class MainWindow extends JFrame implements KeyListener
 	Image lDrop;
 	Image Drop;
 	Image rDrop;
+	Image mainMenu;
 	TexturePaint foregroundPaint;
 	int bgTileSize;
 	boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
+	boolean zeroPressed;
+	int debugSleepTime = 10;
+	Blob debugBlob;
+	GameState state = GameState.MAIN_MENU;
 	//font levelText
 	Level l;
 	public MainWindow()
@@ -53,14 +59,17 @@ public class MainWindow extends JFrame implements KeyListener
 		bgTile.getGraphics().drawImage(tile, 0, 0, bgTileSize, bgTileSize, this);
 		foregroundPaint = new TexturePaint(fgTile, new Rectangle2D.Double(0,0,bgTileSize*2, bgTileSize*2));
 		backgroundImage = new BufferedImage(xSize+bgTileSize*2, ySize+bgTileSize*2, BufferedImage.TYPE_3BYTE_BGR);
+		mainMenu = new ImageIcon("res/mainmenu.png").getImage();
+		buffer.getGraphics().drawImage(mainMenu, 0, 0, xSize, ySize, null);
 		Graphics g = backgroundImage.getGraphics();
 		for(int i=0; i<xSize/bgTileSize+2; i++)
 			for(int j=0; j<ySize/bgTileSize+2; j++)
 				g.drawImage(bgTile, i*bgTileSize, j*bgTileSize, bgTileSize, bgTileSize, this);
 		//backgroundImage.flush();
-		setUndecorated(true);
+		if(!debug)setUndecorated(true);
 		this.setVisible(true);
 		ds = new DrawingState(xSize, ySize, 50, 0, 0);
+		if(debug) ds = new DrawingState(xSize/2, ySize/2, 50, 0, 0);
 		this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
 		done = false;
 		//PlaySound woosh = new PlaySound(PlaySound.FAST, true, 0);
@@ -68,9 +77,26 @@ public class MainWindow extends JFrame implements KeyListener
 			public void run() {
 				while(true)
 				{
-					paintLevel((Graphics2D) getContentPane().getGraphics());
+					if(state == GameState.MAIN_MENU || state == GameState.INFO_SCREEN)
+					{
+						paintTransitionScreen((Graphics2D) getContentPane().getGraphics());
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					if(debug) try{Thread.sleep(debugSleepTime);}catch(Exception e){}
+					if(!debug || zeroPressed) paintLevel((Graphics2D) getContentPane().getGraphics());
 				}
 			}
+
+			private void paintTransitionScreen(Graphics2D graphics) {
+				// TODO Auto-generated method stub
+				graphics.drawImage(buffer, 0, 0,null);
+			}
+
 		});
 		Thread soundEffects = new Thread(new Runnable() {
 			public void run() {
@@ -93,6 +119,7 @@ public class MainWindow extends JFrame implements KeyListener
 		soundEffects.start();
 		addKeyListener(this);
 		renderThread.start();
+		state = GameState.MAIN_MENU;
 		new PlaySound(PlaySound.MAINLOOP, true);
 	}
 	public void paintLevel(Graphics2D g)
@@ -164,10 +191,48 @@ public class MainWindow extends JFrame implements KeyListener
 			spacePressed = true;
 		if(e.getKeyCode()==e.VK_R)
 		{
-			Point2D p = new Point2D.Double();
-			p.setLocation(l.startPoint);
-			pe = new PhysicsEngine(l, new Blob(1, p));
+			if(!debug)
+			{
+				Point2D p = new Point2D.Double();
+				p.setLocation(l.startPoint);
+				pe = new PhysicsEngine(l, new Blob(1, p));
+			}
+			else
+			{
+				pe.blob = debugBlob;
+				Point2D loc = new Point2D.Double();
+				loc.setLocation(pe.blob.center);
+				debugBlob = new Blob(pe.blob.unstressedsize, loc);
+				debugBlob.aspectratio = pe.blob.aspectratio;
+				debugBlob.VelocityX = pe.blob.VelocityX;
+				debugBlob.VelocityY = pe.blob.VelocityY;
+				debugBlob.stuckSurface = pe.blob.stuckSurface;
+				debugBlob.orientation = pe.blob.orientation;
+			}
 		}
+		if(e.getKeyCode()==e.VK_NUMPAD0)
+			zeroPressed = true;
+		if(e.getKeyCode()==e.VK_NUMPAD1)
+		{
+			System.out.println("Typing is hard");
+			Point2D loc = new Point2D.Double();
+			loc.setLocation(pe.blob.center);
+			debugBlob = new Blob(pe.blob.unstressedsize, loc);
+			debugBlob.aspectratio = pe.blob.aspectratio;
+			debugBlob.VelocityX = pe.blob.VelocityX;
+			debugBlob.VelocityY = pe.blob.VelocityY;
+			debugBlob.stuckSurface = pe.blob.stuckSurface;
+			debugBlob.orientation = pe.blob.orientation;
+		}
+		if(e.getKeyCode()==e.VK_UP)
+		{
+			debugSleepTime--;
+			if(debugSleepTime<0)
+				debugSleepTime++;
+			System.out.println("up");
+		}
+		if(e.getKeyCode()==e.VK_DOWN)
+			debugSleepTime++;
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
@@ -180,12 +245,19 @@ public class MainWindow extends JFrame implements KeyListener
 		if(e.getKeyCode()==e.VK_RIGHT)
 			rightPressed = false;
 		if(e.getKeyCode()==e.VK_SPACE)
+		{
+			if(state == GameState.MAIN_MENU)
+			{
+				state = GameState.INFO_SCREEN;
+			}
 			spacePressed = false;
+		}
+		if(e.getKeyCode()==e.VK_NUMPAD0)
+			zeroPressed = false;
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {
-		// nothing to see here...
-		
+
 	}
 
 }
