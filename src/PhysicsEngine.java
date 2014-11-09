@@ -14,6 +14,7 @@ public class PhysicsEngine
 	private final double tension = 10;
 	private final double DeltaT = 0.05;
 	private final double viscosity = 5;
+	private final double jumpThreshold = 4.5;
 	
 	public boolean SpaceWasPressedWhenYouCollided = false;
 	public ArrayList<Boolean> SpaceHistory = new ArrayList<Boolean>(Arrays.asList(false, false, false, false, false, false));
@@ -98,11 +99,21 @@ public class PhysicsEngine
 					//System.out.println("Blob has left ground");
 					//blob has successfully bounced off the ground
 					//must leave a little velocity behind to take off
-					justJumped = true;
 					double tSize = (blob.unstressedsize/2 - findDistance(blob.center, s))/vnorm;
 					blob.move(tSize);
-					blob.freeFromSurface();
-					blob.move(DeltaT-tSize);
+					if(vnorm > jumpThreshold)
+					{
+						//System.out.println(vnorm);
+						justJumped = true;
+						blob.freeFromSurface();
+						blob.move(DeltaT-tSize);
+					}
+					else
+					{
+						blob.setVelocityTanNorm(vtan, 0);
+						blob.aspectratio = 1;
+						blob.move(DeltaT);
+					}
 					return;
 					//finishStep(LeftPressed,RightPressed,UpPressed,DownPressed,SpacePressed,DeltaT-tSize);
 				}

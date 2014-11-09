@@ -18,10 +18,14 @@ public class MainWindow extends JFrame implements KeyListener
 	PhysicsEngine pe;
 	DrawingState ds;
 	BufferedImage buffer;
-	BufferedImage backgroundImage; 
+	BufferedImage backgroundImage;
 	Image bgTile;
+	Image lDrop;
+	Image Drop;
+	Image rDrop;
 	int bgTileSize;
 	boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
+	//font levelText
 	Level l;
 	public MainWindow()
 	{
@@ -36,6 +40,9 @@ public class MainWindow extends JFrame implements KeyListener
 		pe = new PhysicsEngine(l,new Blob(1,p));
 		GraphicsDevice myDevice = this.getGraphicsConfiguration().getDevice();
 		setSize(xSize,ySize);
+		lDrop = new ImageIcon("res/textures/Happy Droplet Left.png").getImage();
+		Drop = new ImageIcon("res/textures/Happy Droplet.png").getImage();
+		rDrop = new ImageIcon("res/textures/Happy Droplet Right.png").getImage();
 		bgTile = new ImageIcon("res/textures/backtile.png").getImage();
 		bgTileSize = bgTile.getHeight(this);
 		backgroundImage = new BufferedImage(xSize+bgTileSize*2, ySize+bgTileSize*2, BufferedImage.TYPE_3BYTE_BGR);
@@ -104,10 +111,19 @@ public class MainWindow extends JFrame implements KeyListener
 		myGraphics.rotate(-b.orientation);
 		//draw a rectangle representing blob location
 		myGraphics.setColor(Color.CYAN);
-		myGraphics.fillOval((int)(-ds.zoomLevel*b.aspectratio*b.unstressedsize/2), 
+		/*myGraphics.fillOval((int)(-ds.zoomLevel*b.aspectratio*b.unstressedsize/2), 
 				(int)(-ds.zoomLevel/b.aspectratio*b.unstressedsize/2), 
 				(int)(ds.zoomLevel*b.aspectratio*b.unstressedsize), 
-				(int)(ds.zoomLevel/b.aspectratio*b.unstressedsize));
+				(int)(ds.zoomLevel/b.aspectratio*b.unstressedsize));*/
+		Image cDrop = Drop;
+		if(leftPressed && !rightPressed)
+			cDrop = lDrop;
+		if(rightPressed && !leftPressed)
+			cDrop = rDrop;
+		myGraphics.drawImage(cDrop,(int)(-ds.zoomLevel*b.aspectratio*b.unstressedsize/2), 
+				(int)(-ds.zoomLevel/b.aspectratio*b.unstressedsize/2), 
+				(int)(ds.zoomLevel*b.aspectratio*b.unstressedsize), 
+				(int)(ds.zoomLevel/b.aspectratio*b.unstressedsize), null);
 		//put the graphics state back to where it was
 		//I have no idea if this will work
 		myGraphics.rotate(b.orientation);
