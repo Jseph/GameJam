@@ -39,7 +39,7 @@ public class MainWindow extends JFrame implements KeyListener
 			myDevice.setFullScreenWindow(null);
 			
 		}*/
-		ds = new DrawingState(xSize, ySize, 20, 0, 0);
+		ds = new DrawingState(xSize, ySize, 50, 0, 0);
 		this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
 		done = false;
 		Thread renderThread = new Thread(new Runnable() {
@@ -52,6 +52,22 @@ public class MainWindow extends JFrame implements KeyListener
 				}
 			}
 		});
+		Thread soundEffects = new Thread(new Runnable() {
+			public void run() {
+				int jumpNum = 0;
+				while(true)
+				{
+					try {Thread.sleep(10);} catch (InterruptedException e) {}
+					if(pe.justJumped)
+					{
+						new PlaySound(PlaySound.JUMPSTART+jumpNum++, false);
+						jumpNum = jumpNum%PlaySound.NUMJUMPS;
+						pe.justJumped = false;
+					}
+				}
+			}
+		});
+		soundEffects.start();
 		addKeyListener(this);
 		renderThread.start();
 		new PlaySound(PlaySound.MAINLOOP, true);

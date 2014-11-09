@@ -2,8 +2,21 @@ import java.io.*;
 import javax.sound.sampled.*;
 public class PlaySound implements Runnable
 {
-	public static final String[] files = new String[]{"mainLoop.wav"};
+	public static final String[] files;
+	static
+	{
+		files = new String[40];
+		files[0] = "mainLoop.wav";
+		files [1] = "res/start.wav";
+		files [2] = "res/fast.wav";
+		for(int i=0; i<32; i++)
+			files[i+3] = "res/j"+(i+1)+".wav";
+	}
 	public static final int MAINLOOP = 0;
+	public static final int START = 1;
+	public static final int FAST = 2;
+	public static final int JUMPSTART = 3;
+	public static final int NUMJUMPS = 32;
 	boolean loop;
 	String fileLocation;
 	PlaySound(int soundType, boolean loop)

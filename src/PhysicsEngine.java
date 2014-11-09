@@ -19,11 +19,13 @@ public class PhysicsEngine
 	public ArrayList<Boolean> SpaceHistory = new ArrayList<Boolean>(Arrays.asList(false, false, false));
 	public Level level;
 	public Blob blob;
+	public boolean justJumped;
 	
 	public PhysicsEngine(Level l, Blob b)
 	{
 		level = l;
 		blob = b;
+		justJumped = false;
 	}
 	
 	public synchronized void step(boolean LeftPressed, boolean RightPressed, boolean UpPressed, boolean DownPressed, boolean SpacePressed)
@@ -95,6 +97,7 @@ public class PhysicsEngine
 					//System.out.println("Blob has left ground");
 					//blob has successfully bounced off the ground
 					//must leave a little velocity behind to take off
+					justJumped = true;
 					double tSize = (blob.unstressedsize/2 - findDistance(blob.center, s))/vnorm;
 					blob.move(tSize);
 					blob.freeFromSurface();
