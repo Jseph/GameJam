@@ -25,6 +25,7 @@ public class MainWindow extends JFrame implements KeyListener
 	Image rDrop;
 	int bgTileSize;
 	boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
+	//font levelText
 	Level l;
 	public MainWindow()
 	{
