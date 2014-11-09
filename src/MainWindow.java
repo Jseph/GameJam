@@ -3,6 +3,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.*;
@@ -23,6 +24,7 @@ public class MainWindow extends JFrame implements KeyListener
 	Image lDrop;
 	Image Drop;
 	Image rDrop;
+	TexturePaint foregroundPaint;
 	int bgTileSize;
 	boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed;
 	//font levelText
@@ -43,8 +45,13 @@ public class MainWindow extends JFrame implements KeyListener
 		lDrop = new ImageIcon("res/textures/Happy Droplet Left.png").getImage();
 		Drop = new ImageIcon("res/textures/Happy Droplet.png").getImage();
 		rDrop = new ImageIcon("res/textures/Happy Droplet Right.png").getImage();
-		bgTile = new ImageIcon("res/textures/backtile.png").getImage();
+		Image tile = new ImageIcon("res/textures/backtile.png").getImage();
+		BufferedImage fgTile = new BufferedImage(tile.getHeight(this), tile.getWidth(this), BufferedImage.TYPE_3BYTE_BGR);
+		fgTile.getGraphics().drawImage(tile, 0, 0, this);
+		bgTile = new BufferedImage(tile.getHeight(this)/2, tile.getWidth(this)/2, BufferedImage.TYPE_3BYTE_BGR);
 		bgTileSize = bgTile.getHeight(this);
+		bgTile.getGraphics().drawImage(tile, 0, 0, bgTileSize, bgTileSize, this);
+		foregroundPaint = new TexturePaint(fgTile, new Rectangle2D.Double(0,0,bgTileSize*2, bgTileSize*2));
 		backgroundImage = new BufferedImage(xSize+bgTileSize*2, ySize+bgTileSize*2, BufferedImage.TYPE_3BYTE_BGR);
 		Graphics g = backgroundImage.getGraphics();
 		for(int i=0; i<xSize/bgTileSize+2; i++)
@@ -93,28 +100,18 @@ public class MainWindow extends JFrame implements KeyListener
 		long ts = System.currentTimeMillis();
 		Graphics2D myGraphics = (Graphics2D) buffer.getGraphics();
 		myGraphics.drawImage(backgroundImage, -(((int)(ds.topLeftX*ds.zoomLevel/fgbgratio+Integer.MAX_VALUE/2))%bgTileSize), -(((int)(ds.topLeftY*ds.zoomLevel/fgbgratio + Integer.MAX_VALUE/2))%bgTileSize), this);
+		//myGraphics.setPaint(foregroundPaint);
+		//myGraphics.fillRect(4, 4, 800, 800);
 		Level l = pe.level;
 		Blob b = pe.blob;
 		ds.keepInMiddleBox(b.center);
-		//Removing the previous rendered frame
-		//myGraphics.setColor(Color.black);
-		//myGraphics.fillRect(0, 0, ds.width, ds.height);
-		//Here is some goofy stuff I found online, not sure what it actually does
 		myGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    myGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		//Drawing the blob... THIS WILL BE HARD
-		//for now it is just a rectangle
-		//Translate graphics to the location of the blob
 		Point2D blobLoc = ds.mapPoint(b.center);
 		myGraphics.translate((int)blobLoc.getX(), (int)blobLoc.getY());
 		//Rotate graphics to align with the blob
 		myGraphics.rotate(-b.orientation);
 		//draw a rectangle representing blob location
-		myGraphics.setColor(Color.CYAN);
-		/*myGraphics.fillOval((int)(-ds.zoomLevel*b.aspectratio*b.unstressedsize/2), 
-				(int)(-ds.zoomLevel/b.aspectratio*b.unstressedsize/2), 
-				(int)(ds.zoomLevel*b.aspectratio*b.unstressedsize), 
-				(int)(ds.zoomLevel/b.aspectratio*b.unstressedsize));*/
 		Image cDrop = Drop;
 		if(leftPressed && !rightPressed)
 			cDrop = lDrop;

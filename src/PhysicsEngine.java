@@ -219,9 +219,12 @@ public class PhysicsEngine
 	{
 		Surface best = null;
 		double bestNVel = 999;
-		before = new Point2D.Double(before.getX()+blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
+		/*before = new Point2D.Double(before.getX()+blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
                 before.getY()+blob.VelocityY * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2);
-
+		 */
+		//Was based on the leading edge of the blob, now is set back to the center of the blob for
+		//more robust collision detection
+		before = new Point2D.Double(before.getX(),before.getY());
 		Line2D moveVec = new Line2D.Double(before,new Point2D.Double(
 				blob.center.getX() + blob.VelocityX * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2, 
 				blob.center.getY() + blob.VelocityY * blob.unstressedsize/Math.sqrt(blob.VelocityX*blob.VelocityX+blob.VelocityY*blob.VelocityY)/2));
@@ -282,7 +285,7 @@ public class PhysicsEngine
 			}
 
 		}
-		if(best!=null) return best;
+		if(best!=null) return best;//Might be a culprit... Hard to say
 		if(Double.isNaN(moveVec.getY2())) return null;
 		//This specifically only matches if the blob passes straight through 
 		for(Surface s:level.surfaces)
