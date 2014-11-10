@@ -54,12 +54,12 @@ public class MainWindow extends JFrame implements KeyListener
 		Drop = new ImageIcon("res/textures/Happy Droplet.png").getImage();
 		rDrop = new ImageIcon("res/textures/Happy Droplet Right.png").getImage();
 		Image tile = new ImageIcon("res/textures/backtile.png").getImage();
-		BufferedImage fgTile = new BufferedImage(tile.getHeight(this), tile.getWidth(this), BufferedImage.TYPE_3BYTE_BGR);
-		fgTile.getGraphics().drawImage(tile, 0, 0, this);
+		//BufferedImage fgTile = new BufferedImage(tile.getHeight(null), tile.getWidth(null), BufferedImage.TYPE_3BYTE_BGR);
+		//fgTile.getGraphics().drawImage(tile, 0, 0, this);
 		bgTile = new BufferedImage(tile.getHeight(this)/2, tile.getWidth(this)/2, BufferedImage.TYPE_3BYTE_BGR);
 		bgTileSize = bgTile.getHeight(this);
 		bgTile.getGraphics().drawImage(tile, 0, 0, bgTileSize, bgTileSize, this);
-		foregroundPaint = new TexturePaint(fgTile, new Rectangle2D.Double(0,0,bgTileSize*2, bgTileSize*2));
+		//foregroundPaint = new TexturePaint(fgTile, new Rectangle2D.Double(0,0,bgTileSize*2, bgTileSize*2));
 		backgroundImage = new BufferedImage(xSize+bgTileSize*2, ySize+bgTileSize*2, BufferedImage.TYPE_3BYTE_BGR);
 		mainMenu = new ImageIcon("res/mainmenu.png").getImage();
 		buffer.getGraphics().drawImage(mainMenu, 0, 0, xSize, ySize, null);
@@ -202,6 +202,8 @@ public class MainWindow extends JFrame implements KeyListener
 		if(e.getKeyCode()==e.VK_ENTER)
 		{
 			cLevel++;
+			if(cLevel>13)
+				cLevel = 6;
 			loadLevel();
 		}
 		if(e.getKeyCode()==e.VK_R)
